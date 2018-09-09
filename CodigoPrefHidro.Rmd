@@ -1,0 +1,99 @@
+---
+title: "Analises_Tese"
+author: "Ana Lu"
+date: "9 de setembro de 2018"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+#Análise das entrevistas dos atores da Preferência Hidrossocial
+
+##Carregando e preparando o texto
+
+```{r, collapse=FALSE}
+library(pdftools)
+library(tidyverse)
+```
+```{r}
+library(readtext)
+```
+
+```{r}
+textoHidro <- readtext(paste0("Entrevistas_Hidro/*.pdf"))
+```
+
+```{r, collapse=FALSE}
+library(stringr)
+library(tm)
+
+```
+```{r}
+EntrevHidro <- textoHidro %>%
+  paste(textoHidro,collapse = " ") %>%
+  removeNumbers() %>%
+  removePunctuation() %>%
+  str_remove_all("\r") %>% 
+  str_remove_all("\n") %>% 
+  str_to_lower() %>% 
+  stripWhitespace()
+```
+Agora estamos trabalhando com um objeto `class(EntrevHidro)`
+
+##Transformando em dataframe e tokenizando
+
+```{r}
+entrevHidro_df <- data_frame(id_discurso = 1:length(EntrevHidro), 
+                           text = EntrevHidro)
+
+```
+```{r}
+library(tidytext)
+```
+
+
+```{r}
+entrevHidro_token <- entrevHidro_df %>%
+  unnest_tokens(word, text)
+
+```
+```{r}
+stopwords_pt <- c(stopwords("pt"), "que", "é", "entrevistado",
+                  "entrevistador", "pra", "porque", "r", "nentrevistador", 
+                  "nentrevistado", "n", "questão", "vai", "ai",
+                  "aqui", "sobre", "assim", "etc","pois", "desse", "né", "aí", "paulo",
+                  "ainda", "então", "gente", "ser", "joão", "ricardo", "de", "lá", 
+                  "acho", "ter", "sim", "coisa", "fazer")
+```
+
+```{r, collapse=FALSE}
+stopwords_pt_df <- data.frame(word = stopwords_pt)
+
+entrevHidro_token <- entrevHidro_token %>%
+  anti_join(stopwords_pt_df, by = "word")
+
+entrevHidro_token %>%
+  count(word, sort = TRUE)
+```
+
+```{r}
+entrevHidro_token %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 150) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot()+
+  geom_col(aes(word, n),colour="black", fill= "green") +
+  xlab(NULL) +
+  coord_flip()
+```
+
+```{r}
+library(wordcloud)
+```
+
+```{r}
+entrevHidro_token %>%
+  count(word, sort = T) %>%
+  with(wordcloud(word, n, use.r.layout = TRUE, max.words = 50))
+```
+
