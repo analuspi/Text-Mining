@@ -7,9 +7,9 @@ output:
   pdf_document: default
 ---
 
-#Análise das entrevistas dos atores da Preferência Hidrossocial
+# Análise das entrevistas dos atores da Preferência Hidrossocial
 
-##Carregando e preparando o texto
+## Carregando e preparando o texto
 
 ```{r, collapse=FALSE}
 library(pdftools)
@@ -40,7 +40,7 @@ EntrevHidro <- textoHidro %>%
 ```
 Agora estamos trabalhando com um objeto `class(EntrevHidro)`
 
-##Transformando em dataframe e tokenizando
+## Transformando em dataframe e tokenizando
 
 ```{r}
 entrevHidro_df <- data_frame(id_discurso = 1:length(EntrevHidro), 
